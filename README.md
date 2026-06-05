@@ -2,25 +2,25 @@
 
 用于跟踪 Serenity（[@aleabitoreddit](https://x.com/aleabitoreddit)）X/Twitter 投资观点的 PaiWork-first Skill。
 
-这个仓库把一组散落的 PaiWork/Codex 工作流整理成一个可发布的 Skill：从 Serenity 推文出发，沉淀为公司研究文件、可验证 thesis/claim 台账、供应链关系图谱、每日/每周报告和 research backlog。
+它从 Serenity 推文出发，沉淀公司研究文件、可验证 thesis/claim 台账、供应链关系图谱、每日/每周报告和 research backlog，服务于持续更新的投资观点跟踪。
 
 ## 重要说明
 
-这一版 **强依赖 PaiWork**。
+当前版本面向 **PaiWork** 运行环境设计。
 
-很多流程默认 PaiWork 环境存在，包括 PaiWork 的 analyst report 生成、市场数据、Paipai 搜索、研究数据源、工作区结构和内部工具调用。当前版本主要支持 PaiWork；后续可以再补一个更通用的 agent 版本，但这版不应被理解成“脱离 PaiWork 也完整可用”的通用开源 Skill。
+完整工作流依赖 PaiWork 的 analyst report、市场数据、Paipai 搜索、研究数据源和工作区结构。当前版本主要支持 PaiWork 场景，不提供脱离 PaiWork 后的完整通用 agent 运行保证。
 
-另外，这个仓库目前刻意 **不增加额外依赖**。`scripts/fetch_daily.py` 只使用 Python 标准库，并假设前端/PaiWork 环境里已经有可用的 CDP browser bridge。除非后续有明确产品理由，不要为了开源版临时加入新的包依赖。
+`scripts/fetch_daily.py` 只使用 Python 标准库；抓取能力依赖 PaiWork 或前端环境提供的 CDP browser bridge。
 
-## 它解决什么
+## 核心能力
 
 - 通过已有浏览器登录态抓取 Serenity 推文。
 - 将原始推文写入 `raw/serenity_statuses.jsonl`。
 - 生成每日 markdown intake 文件。
-- 引导 PaiWork/Codex 判断推文研究价值。
+- 引导 PaiWork 判断推文研究价值。
 - 从推文中抽取结构化 thesis、claim、ticker 和公司间关系。
 - 维护公司研究文件和供应链 Map，避免重复维护同一信息。
-- 生成增量式日报、周报和后续研究任务。
+- 生成增量式日报、周报和 research backlog。
 
 ## 目录结构
 
@@ -72,7 +72,7 @@ tree/Serenity/
     └── serenity_YYYY-MM-DD.md
 ```
 
-然后在 PaiWork/Codex 中继续处理每日 intake，例如：
+然后在 PaiWork 中继续处理每日 intake，例如：
 
 ```text
 执行 Serenity 每日观点处理
@@ -96,15 +96,15 @@ tree/Serenity/
 ## 限制
 
 - 这不是一个独立 X scraper；它依赖已登录浏览器和 PaiWork/front-end CDP bridge。
-- 它本身不负责翻译和投资分析；抓取完成后的推理、分类、验证和报告生成由 PaiWork/Codex 执行。
+- 它本身不负责翻译和投资分析；抓取完成后的推理、分类、验证和报告生成由 PaiWork 执行。
 - X/Twitter DOM 可能变化；如果抓取失败，需要更新 `scripts/fetch_daily.py` 中的 DOM 提取逻辑。
 - 数据访问和结果质量取决于登录账号、可见内容和 PaiWork 环境。
 
 ## Roadmap
 
-- 补一个不假设 PaiWork 工具存在的通用 agent 工作流。
-- 补非 PaiWork CDP bridge 的 adapter 说明。
-- 等公共 contract 稳定后，再补可公开的 tests/fixtures。
+- 通用 agent 工作流。
+- 非 PaiWork CDP bridge adapter。
+- 可公开的 tests/fixtures。
 
 ## License
 
