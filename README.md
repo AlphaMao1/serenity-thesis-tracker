@@ -1,28 +1,28 @@
 # Serenity Thesis Tracker
 
-PaiWork-first skill for tracking Serenity (@aleabitoreddit) investment theses from X/Twitter posts.
+用于跟踪 Serenity（[@aleabitoreddit](https://x.com/aleabitoreddit)）X/Twitter 投资观点的 PaiWork-first Skill。
 
-This repository packages a Codex/PaiWork skill that turns Serenity's posts into cumulative research assets: company files, verifiable thesis and claim ledgers, supply-chain relationship maps, daily reports, weekly reviews, and research backlog items.
+这个仓库把一组散落的 PaiWork/Codex 工作流整理成一个可发布的 Skill：从 Serenity 推文出发，沉淀为公司研究文件、可验证 thesis/claim 台账、供应链关系图谱、每日/每周报告和 research backlog。
 
-## Important Status
+## 重要说明
 
-This version is strongly dependent on PaiWork.
+这一版 **强依赖 PaiWork**。
 
-Many workflows assume PaiWork-specific tools, data sources, analyst report generation, market-data access, Paipai search, and workspace conventions. The current release mainly supports the PaiWork environment. A more generic agent version can be added later, but this repository should not pretend to be fully portable yet.
+很多流程默认 PaiWork 环境存在，包括 PaiWork 的 analyst report 生成、市场数据、Paipai 搜索、研究数据源、工作区结构和内部工具调用。当前版本主要支持 PaiWork；后续可以再补一个更通用的 agent 版本，但这版不应被理解成“脱离 PaiWork 也完整可用”的通用开源 Skill。
 
-The bundled fetch script intentionally adds no package dependencies. It uses Python standard-library modules and expects an existing PaiWork/front-end CDP-compatible browser bridge. Do not add new dependencies unless there is a clear product reason.
+另外，这个仓库目前刻意 **不增加额外依赖**。`scripts/fetch_daily.py` 只使用 Python 标准库，并假设前端/PaiWork 环境里已经有可用的 CDP browser bridge。除非后续有明确产品理由，不要为了开源版临时加入新的包依赖。
 
-## What It Does
+## 它解决什么
 
-- Fetch Serenity posts from a logged-in browser session through an existing CDP bridge.
-- Store raw posts in `raw/serenity_statuses.jsonl`.
-- Generate a daily markdown intake file under `daily/`.
-- Guide PaiWork/Codex to classify posts by research value.
-- Extract structured thesis, claims, tickers, and company relationships.
-- Update company files and supply-chain maps without duplicating source-of-truth content.
-- Generate incremental daily and weekly research reports.
+- 通过已有浏览器登录态抓取 Serenity 推文。
+- 将原始推文写入 `raw/serenity_statuses.jsonl`。
+- 生成每日 markdown intake 文件。
+- 引导 PaiWork/Codex 判断推文研究价值。
+- 从推文中抽取结构化 thesis、claim、ticker 和公司间关系。
+- 维护公司研究文件和供应链 Map，避免重复维护同一信息。
+- 生成增量式日报、周报和后续研究任务。
 
-## Repository Layout
+## 目录结构
 
 ```text
 serenity-thesis-tracker/
@@ -41,27 +41,27 @@ serenity-thesis-tracker/
 └── README.md
 ```
 
-## Runtime Expectations
+## 运行环境
 
-For full functionality, run inside PaiWork or a PaiWork-compatible environment with:
+完整功能需要在 PaiWork 或 PaiWork-compatible 环境中运行，并具备：
 
-- PaiWork analyst/report tooling for company pages, daily reports, and weekly reviews.
-- PaiWork search, market-data, and research data sources for independent verification.
-- A logged-in X/Twitter browser session.
-- A CDP-compatible bridge at `http://localhost:3456` supporting `/health`, `/new`, `/eval`, `/scroll`, and `/close`.
-- Python 3.10+ for the bundled fetch script.
+- PaiWork analyst/report 工具，用于生成公司页、日报和周报。
+- PaiWork 搜索、市场数据和研究数据源，用于独立验证。
+- 已登录 X/Twitter 的浏览器会话。
+- 一个 CDP-compatible bridge，默认地址为 `http://localhost:3456`，并支持 `/health`、`/new`、`/eval`、`/scroll`、`/close`。
+- Python 3.10+，用于运行内置抓取脚本。
 
-No Python packages are required by `scripts/fetch_daily.py`.
+`scripts/fetch_daily.py` 不需要安装任何 Python 包。
 
-## Quick Start
+## 快速开始
 
-From the skill root:
+在 Skill 根目录运行：
 
 ```powershell
 python scripts/fetch_daily.py --out-dir tree/Serenity --handle aleabitoreddit
 ```
 
-The script writes:
+脚本会写出：
 
 ```text
 tree/Serenity/
@@ -72,39 +72,39 @@ tree/Serenity/
     └── serenity_YYYY-MM-DD.md
 ```
 
-Then ask PaiWork/Codex to process the daily intake, for example:
+然后在 PaiWork/Codex 中继续处理每日 intake，例如：
 
 ```text
 执行 Serenity 每日观点处理
 ```
 
-## Skill Workflow
+## Skill 工作流
 
-The main workflow is defined in `SKILL.md`.
+主流程定义在 `SKILL.md`。
 
-High-level flow:
+高层流程：
 
-1. Fetch Serenity posts.
-2. Classify each post as thesis, update, evidence, catalyst, risk, rebuttal, price-action comment, noise, or meta.
-3. Score materiality from 5 to 15.
-4. Extract thesis only when the post contains a causal investment chain.
-5. Convert thesis into verifiable claims and company-to-company relationships.
-6. Update company research files as the single source of truth.
-7. Update supply-chain maps as the relationship navigation layer.
-8. Generate daily/weekly reports as incremental logs.
+1. 抓取 Serenity 推文。
+2. 将推文分类为 thesis、update、evidence、catalyst、risk、rebuttal、price-action comment、noise 或 meta。
+3. 按 5-15 分做 materiality 评分。
+4. 只在推文包含明确投资因果链时抽取 thesis。
+5. 将 thesis 拆成可验证 claims 和公司间关系。
+6. 更新公司研究文件，作为单公司唯一事实源。
+7. 更新供应链 Map，作为关系导航层。
+8. 生成日报/周报，作为增量日志。
 
-## Limitations
+## 限制
 
-- This is not a standalone X scraper. It depends on a logged-in browser and an existing PaiWork/front-end CDP bridge.
-- It does not perform translation or investment analysis by itself; PaiWork/Codex performs the reasoning after intake files are created.
-- X/Twitter DOM selectors can change. If extraction fails, update the DOM extraction logic in `scripts/fetch_daily.py`.
-- Source access and data quality depend on the logged-in account and PaiWork environment.
+- 这不是一个独立 X scraper；它依赖已登录浏览器和 PaiWork/front-end CDP bridge。
+- 它本身不负责翻译和投资分析；抓取完成后的推理、分类、验证和报告生成由 PaiWork/Codex 执行。
+- X/Twitter DOM 可能变化；如果抓取失败，需要更新 `scripts/fetch_daily.py` 中的 DOM 提取逻辑。
+- 数据访问和结果质量取决于登录账号、可见内容和 PaiWork 环境。
 
 ## Roadmap
 
-- Add a generic-agent workflow that does not assume PaiWork tools.
-- Add adapter documentation for non-PaiWork CDP bridges.
-- Add optional tests/fixtures once the public contract stabilizes.
+- 补一个不假设 PaiWork 工具存在的通用 agent 工作流。
+- 补非 PaiWork CDP bridge 的 adapter 说明。
+- 等公共 contract 稳定后，再补可公开的 tests/fixtures。
 
 ## License
 
